@@ -12,6 +12,7 @@ def default(request):
 
         records = read_bookmarks_group_per_folder(request)
         data = {
+            "active_menu" : "bookmark",
             "records" : records
         }
         return render(request, "bookmark.html", {"data" : data})

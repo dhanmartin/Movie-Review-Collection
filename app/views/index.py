@@ -12,6 +12,7 @@ def default(request, page_no=1):
         bookmark_folders = read_bookmark_folders(request)
 
         data = {
+            "active_menu" : "home",
             "records" : response["records"],
             "next_page" : page_no + 1,
             "previous_page" : page_no - 1,
