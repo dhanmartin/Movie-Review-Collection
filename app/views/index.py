@@ -1,4 +1,5 @@
 import requests
+from django.conf import settings
 from app.models.bookmark import Bookmark, Bookmark_folder
 from app.views.common import *
 
@@ -36,7 +37,7 @@ def read_reviews(request,page_no=0,keyword=None) -> dict:
     try:
         max_record = 10
         offset = (page_no - 1) * max_record
-        api_key = "mIq3gHXGmWLJb9cP2m3VTcvomwh8M4j0"
+        api_key = settings.NYTIMES_API_KEY
         
         query = ""
         if keyword:
