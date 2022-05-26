@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block loader_js_bottom %}
+{{ data|json_script:"mydata" }}
+<script src="{% static 'js/bookmark.js' %}"></script>
+{% endblock %}
+{% block content_body %}
+
+<div class="container" style="padding-top: 8rem;padding-bottom: 5rem;">
+    <div class="row">
+        <h2 class="page-section-heading text-uppercase text-secondary mb-0">BOOKMARKS</h2>
+    </div>
+    {% for folder in data.records %}
+    {% with forloop.counter0 as folder_index %}
+    <div class="row">
+        <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">{{ folder.name }}</h2>
+        <div class="divider-custom">
+            <div class="divider-custom-line"></div>
+            <div class="divider-custom-icon"><i class="fas fa-folder"></i></div>
+            <div class="divider-custom-line"></div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        {% for record in folder.lists %}
+        {% with forloop.counter0 as index %}
+        <div class="col-md-6 col-lg-4 mb-5">
+            <div class="portfolio-item mx-auto">
+                <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
+                    <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
+                </div>
+                <img class="img-fluid hand_cursor" src="{{ record.multimedia.src }}" alt="..." onclick="load_review_page({{ folder_index }},{{ index }})"/>
+            </div>
+            <div class="portfolio-item mx-auto">
+                <b class="fs-4 hand_cursor" onclick="load_review_page({{ folder_index }},{{ index }})">{{ record.display_title }}</b>
+                <p class="fw-lighter">
+                    {{ record.summary_short }}
+                </p>
+            </div>
+            <div class="portfolio-item mx-auto">
+                {% if request.user.pk %}
+                    {% if record.bookmark %}
+                    <i class="fa-solid fa-star hand_cursor text-success" title="Remove from bookmark" onclick="remove_bookmark_modal({{ folder_index }},{{ index }})"></i>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+
+<div class="modal fade" id="remove_bookmark_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h4 class="modal-title text-danger">Remove Bookmark</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <b class="fs-5 fw-lighter" id="remove_modal_label"></b>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+            <button type="button" id="remove_bookmark" class="btn btn-warning" onclick="remove_bookmark()">Remove</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

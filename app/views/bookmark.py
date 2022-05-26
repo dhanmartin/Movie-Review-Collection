@@ -1,3 +1,4 @@
+from typing import OrderedDict
 from app.forms.bookmark import Bookmark_folder_form, Bookmark_form
 from app.models.bookmark import Bookmark, Bookmark_folder
 from app.views.common import *
@@ -8,10 +9,48 @@ def default(request):
     try:
         if not request.user.pk:
             return redirect("home")
+
+        records = read_bookmarks_group_per_folder(request)
+        data = {
+            "records" : records
+        }
+        return render(request, "bookmark.html", {"data" : data})
     except Exception as e:
         debug_exception(e)
         data = {}
         return render(request, "error.html", {"data" : data})
+
+def read_bookmarks_group_per_folder(request) -> list:
+    """ Read bookmarks group per folder  """
+
+    try:
+        instances = Bookmark.objects.select_related("folder").filter(user=request.user.pk).order_by("folder__name")
+
+        per_folder = OrderedDict()
+
+        for instance in instances:
+            key = instance.folder_id
+            if key not in per_folder:
+                per_folder[key] = {
+                    "name" : instance.folder.name,
+                    "lists" : [],
+                }
+
+            row = instance.data
+            row["bookmark"] = instance.pk
+
+            per_folder[key]["lists"].append(row)
+
+        records = []
+        for i in per_folder:
+            record = per_folder[i]
+
+            records.append(record)
+
+        return records
+    except Exception as e:
+        debug_exception(e)
+        raise e
 
 def add(request):
     """ Add bookmark """
