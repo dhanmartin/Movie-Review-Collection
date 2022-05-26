@@ -103,4 +103,30 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="remove_bookmark_modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+            <h4 class="modal-title text-danger">Remove Bookmark</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <b class="fs-5 fw-lighter" id="remove_modal_label"></b>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+            <button type="button" id="remove_bookmark" class="btn btn-warning" onclick="remove_bookmark()">Remove</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}

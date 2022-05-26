@@ -114,6 +114,52 @@ function add_bookmark() {
     })
 }
 
+function remove_bookmark_modal(index) {
+    current_index = index
+    let record = mydata.records[index]
+    
+    document.getElementById("remove_modal_label").innerHTML = "Remove "+record.display_title+"?"
+    bookmark_modal = new bootstrap.Modal(document.getElementById('remove_bookmark_modal'))
+    bookmark_modal.show()
+}
+
+function remove_bookmark() {
+    let record = mydata.records[current_index]
+
+    let postdata = {
+        "id" : record.bookmark
+    }
+
+    document.getElementById("remove_bookmark").disabled = true
+    fetch("/bookmark/remove", {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers:{
+            'Accept': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(postdata)
+    })
+    .then(response => {
+            document.getElementById("remove_bookmark").disabled = false
+
+            if (!response.ok) {
+                return response.text().then(text => { 
+                    throw new Error(text) 
+                })
+            }
+            return response.text()
+    })
+    .then(data => {
+        bookmark_modal.hide()
+        search()
+    })
+    .catch(error => {
+        alert(error.message)
+    })
+
+}
+
 function load_review_page(index) {
     let record = mydata.records[index]
     window.open(record.link.url);

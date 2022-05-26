@@ -6,4 +6,5 @@ urlpatterns = [
     path('page/<int:page_no>', index.default),
     path('bookmark', bookmark.default),
     path('bookmark/add', bookmark.add),
+    path('bookmark/remove', bookmark.remove),
 ]

@@ -1,5 +1,5 @@
 from app.forms.bookmark import Bookmark_folder_form, Bookmark_form
-from app.models.bookmark import Bookmark_folder
+from app.models.bookmark import Bookmark, Bookmark_folder
 from app.views.common import *
 
 def default(request):
@@ -46,6 +46,30 @@ def add(request):
             instance_form.save()
         else:
             raise_error(beautify_form_errors(instance_form.errors))
+
+        return HttpResponse("Success!")
+    except Exception as e:
+        debug_exception(e)
+        return HttpResponse(str(e), status=400)
+
+def remove(request):
+    """ Remove bookmark """
+
+
+    try:
+        postdata = json.loads(request.body.decode("utf-8")) if request.body.decode("utf-8") else {}
+
+        try:
+            instance = Bookmark.objects.get(id=postdata["id"], user=request.user.pk)
+        except Exception as e:
+            raise_error("Bookmark not found!")
+
+        bookmark_folder = instance.folder_id
+        instance.delete()
+
+        folder_not_empty = Bookmark.objects.filter(folder=bookmark_folder, user=request.user.pk).exists()
+        if not folder_not_empty:
+            Bookmark_folder.objects.filter(id=bookmark_folder).delete()
 
         return HttpResponse("Success!")
     except Exception as e:
