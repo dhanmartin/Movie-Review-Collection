@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block loader_js_bottom %}
+{{ data|json_script:"mydata" }}
+<script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+{% block content_body %}
+
+<div class="container" style="padding-top: 8rem;padding-bottom: 5rem;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search movie title..." aria-describedby="button-addon2" id="search_box" value="{{ data.q }}">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="search()">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <button type="button" class="btn btn-outline-warning {{ data.previous_disabled }}" onclick="previous()"><i class="fa fa-angles-left"></i> Previous</button>
+        </div>
+        <div class="col-sm-6 text-end">
+            <button type="button" class="btn btn-outline-warning {{ data.next_disabled }}" onclick="next()">Next <i class="fa fa-angles-right"></i></button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 text-end">
+            {{ data.records|length }} results
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        {% for record in data.records %}
+            <div class="col-md-6 col-lg-4 mb-5">
+                <div class="portfolio-item mx-auto">
+                    <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
+                        <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-plus fa-3x"></i></div>
+                    </div>
+                    <img class="img-fluid hand_cursor" src="{{ record.multimedia.src }}" alt="..." onclick="load_review_page({{ forloop.counter0 }})"/>
+                </div>
+                <div class="portfolio-item mx-auto">
+                    <b class="fs-4 hand_cursor" onclick="load_review_page({{ forloop.counter0 }})">{{ record.display_title }}</b>
+                    <p class="fw-lighter">
+                        {{ record.summary_short }}
+                    </p>
+                </div>
+                <div class="portfolio-item mx-auto">
+                    {% if request.user.pk %}
+                        {% if record.bookmark %}
+                        <i class="fa-solid fa-star hand_cursor" title="Remove to bookmark"></i>
+                        {% else %}
+                        <i class="fa-regular fa-star hand_cursor" title="Add to bookmark" onclick="show_modal({{ forloop.counter0 }})"></i>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+    <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+        <h4 class="modal-title">Add to Bookmark</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row">
+                <b class="fs-4" id="modal_movie_title"></b>
+                <p class="fw-lighter" id="modal_movie_description"></p>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="text-danger">Select a folder</label>
+                    <select class="form-select" aria-label="Default select example">
+                        <option selected>New Folder</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+
+    </div>
+    </div>
+</div>
+{% endblock %}
