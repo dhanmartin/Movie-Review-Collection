@@ -19,6 +19,12 @@ const csrftoken = getCookie('csrftoken');
 const mydata = JSON.parse(document.getElementById('mydata').textContent)
 let current_index;
 let bookmark_modal;
+
+function refresh() {
+    let url = build_url()
+    window.location.assign(url)
+}
+
 function search() {
     let url = build_url(1)
     window.location.assign(url)
@@ -107,7 +113,7 @@ function add_bookmark() {
     })
     .then(data => {
         bookmark_modal.hide()
-        search()
+        refresh()
     })
     .catch(error => {
         alert(error.message)
@@ -152,7 +158,7 @@ function remove_bookmark() {
     })
     .then(data => {
         bookmark_modal.hide()
-        search()
+        refresh()
     })
     .catch(error => {
         alert(error.message)
