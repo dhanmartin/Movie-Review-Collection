@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block loader_js_bottom %}
-{{ data|json_script:"mydata" }}
 <script src="{% static 'js/bookmark.js' %}"></script>
 {% endblock %}
 {% block content_body %}

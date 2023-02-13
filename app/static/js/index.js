@@ -1,22 +1,4 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
-
-
-const mydata = JSON.parse(document.getElementById('mydata').textContent)
+let DJANGODATA = util.loadTemplateData();
 let current_index;
 let bookmark_modal;
 
@@ -31,12 +13,12 @@ function search() {
 }
 
 function next() {
-    let url = build_url(mydata.next_page)
+    let url = build_url(DJANGODATA.next_page)
     window.location.assign(url)
 }
 
 function previous() {
-    let url = build_url(mydata.previous_page)
+    let url = build_url(DJANGODATA.previous_page)
     window.location.assign(url)
 }
 
@@ -52,7 +34,7 @@ function get_url_for_search() {
 
 function build_url(page_no) {
     if (!page_no) {
-        page_no = mydata.current_page
+        page_no = DJANGODATA.current_page
     }
     let url = "/page/"+page_no+get_url_for_search()
     return url
@@ -60,7 +42,7 @@ function build_url(page_no) {
 
 function show_modal(index) {
     current_index = index
-    let record = mydata.records[index]
+    let record = DJANGODATA.records[index]
     document.getElementById("submit_bookmark").disabled = false
     document.getElementById("modal_movie_title").innerHTML = record.display_title
     document.getElementById("modal_movie_description").innerHTML = record.summary_short
@@ -83,7 +65,7 @@ function bookmark_folder_change(element) {
 }
 
 function add_bookmark() {
-    let record = mydata.records[current_index]
+    let record = DJANGODATA.records[current_index]
 
     let postdata = {
         "name" : document.getElementById("bookmark_folder_name").value,
@@ -92,24 +74,15 @@ function add_bookmark() {
     }
 
     document.getElementById("submit_bookmark").disabled = true
-    fetch("/bookmark/add", {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers:{
-            'Accept': 'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify(postdata)
-    })
-    .then(response => {
-            document.getElementById("submit_bookmark").disabled = false
+    util.postRequest("/bookmark/add", postdata).then(response => {
+        document.getElementById("submit_bookmark").disabled = false
 
-            if (!response.ok) {
-                return response.text().then(text => { 
-                    throw new Error(text) 
-                })
-            }
-            return response.text()
+        if (!response.ok) {
+            return response.text().then(text => { 
+                throw new Error(text) 
+            })
+        }
+        return response.text()
     })
     .then(data => {
         bookmark_modal.hide()
@@ -122,7 +95,7 @@ function add_bookmark() {
 
 function remove_bookmark_modal(index) {
     current_index = index
-    let record = mydata.records[index]
+    let record = DJANGODATA.records[index]
     
     document.getElementById("remove_modal_label").innerHTML = "Remove "+record.display_title+"?"
     bookmark_modal = new bootstrap.Modal(document.getElementById('remove_bookmark_modal'))
@@ -130,31 +103,22 @@ function remove_bookmark_modal(index) {
 }
 
 function remove_bookmark() {
-    let record = mydata.records[current_index]
+    let record = DJANGODATA.records[current_index]
 
     let postdata = {
         "id" : record.bookmark
     }
 
     document.getElementById("remove_bookmark").disabled = true
-    fetch("/bookmark/remove", {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers:{
-            'Accept': 'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify(postdata)
-    })
-    .then(response => {
-            document.getElementById("remove_bookmark").disabled = false
+    util.postRequest("/bookmark/remove", postdata).then(response => {
+        document.getElementById("remove_bookmark").disabled = false
 
-            if (!response.ok) {
-                return response.text().then(text => { 
-                    throw new Error(text) 
-                })
-            }
-            return response.text()
+        if (!response.ok) {
+            return response.text().then(text => { 
+                throw new Error(text) 
+            })
+        }
+        return response.text()
     })
     .then(data => {
         bookmark_modal.hide()
@@ -167,7 +131,7 @@ function remove_bookmark() {
 }
 
 function load_review_page(index) {
-    let record = mydata.records[index]
+    let record = DJANGODATA.records[index]
     window.open(record.link.url);
 }
 

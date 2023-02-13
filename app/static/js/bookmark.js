@@ -1,22 +1,4 @@
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
-
-
-const mydata = JSON.parse(document.getElementById('mydata').textContent)
+let DJANGODATA = util.loadTemplateData();
 let current_record;
 let bookmark_modal;
 
@@ -25,7 +7,7 @@ function refresh() {
 }
 
 function remove_bookmark_modal(key,index) {
-    current_record = mydata.records[key]["lists"][index]
+    current_record = DJANGODATA.records[key]["lists"][index]
     
     document.getElementById("remove_modal_label").innerHTML = "Remove "+current_record.display_title+"?"
     bookmark_modal = new bootstrap.Modal(document.getElementById('remove_bookmark_modal'))
@@ -38,24 +20,15 @@ function remove_bookmark() {
     }
 
     document.getElementById("remove_bookmark").disabled = true
-    fetch("/bookmark/remove", {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers:{
-            'Accept': 'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify(postdata)
-    })
-    .then(response => {
-            document.getElementById("remove_bookmark").disabled = false
+    util.postRequest("/bookmark/remove", postdata).then(response => {
+        document.getElementById("remove_bookmark").disabled = false
 
-            if (!response.ok) {
-                return response.text().then(text => { 
-                    throw new Error(text) 
-                })
-            }
-            return response.text()
+        if (!response.ok) {
+            return response.text().then(text => { 
+                throw new Error(text) 
+            })
+        }
+        return response.text()
     })
     .then(data => {
         bookmark_modal.hide()
@@ -68,6 +41,6 @@ function remove_bookmark() {
 }
 
 function load_review_page(key,index) {
-    let record = mydata.records[key]["lists"][index]
+    let record = DJANGODATA.records[key]["lists"][index]
     window.open(record.link.url);
 }
