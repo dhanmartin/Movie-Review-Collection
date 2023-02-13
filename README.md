@@ -5,7 +5,4 @@ Copy this script, and provide the keys.
 
 #.env
 
-SECRET_KEY=
-
-
 NYTIMES_API_KEY=
