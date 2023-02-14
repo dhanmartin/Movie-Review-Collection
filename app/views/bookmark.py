@@ -1,10 +1,29 @@
+import json
 from typing import OrderedDict
-from app.forms.bookmark import Bookmark_folder_form, Bookmark_form
-from app.models.bookmark import Bookmark, Bookmark_folder
-from app.views.common import *
+
+from django.shortcuts import (
+    HttpResponse,
+    redirect,
+    render,
+)
+
+from app.forms.bookmark import (
+    Bookmark_folder_form,
+    Bookmark_form,
+)
+from app.models.bookmark import (
+    Bookmark,
+    Bookmark_folder,
+)
+from app.views.common import (
+    beautify_form_errors,
+    debug_exception,
+    raise_error,
+)
+
 
 def default(request):
-    """ Main page """
+    """Main page"""
 
     try:
         if not request.user.pk:
@@ -12,17 +31,18 @@ def default(request):
 
         records = read_bookmarks_group_per_folder(request)
         data = {
-            "active_menu" : "bookmark",
-            "records" : records
+            "active_menu": "bookmark",
+            "records": records,
         }
-        return render(request, "bookmark.html", {"data" : data})
+        return render(request, "bookmark.html", {"data": data})
     except Exception as e:
         debug_exception(e)
         data = {}
-        return render(request, "error.html", {"data" : data})
+        return render(request, "error.html", {"data": data})
+
 
 def read_bookmarks_group_per_folder(request) -> list:
-    """ Read bookmarks group per folder  """
+    """Read bookmarks group per folder"""
 
     try:
         instances = Bookmark.objects.select_related("folder").filter(user=request.user.pk).order_by("folder__name")
@@ -33,8 +53,8 @@ def read_bookmarks_group_per_folder(request) -> list:
             key = instance.folder_id
             if key not in per_folder:
                 per_folder[key] = {
-                    "name" : instance.folder.name,
-                    "lists" : [],
+                    "name": instance.folder.name,
+                    "lists": [],
                 }
 
             row = instance.data
@@ -53,20 +73,20 @@ def read_bookmarks_group_per_folder(request) -> list:
         debug_exception(e)
         raise e
 
-def add(request):
-    """ Add bookmark """
 
+def add(request):
+    """Add bookmark"""
 
     try:
         postdata = json.loads(request.body.decode("utf-8")) if request.body.decode("utf-8") else {}
-        
+
         bookmark_folder = postdata.get("folder")
         if not bookmark_folder:
             folder_name = postdata.get("name")
 
             data = {
-                "user" : request.user.pk,
-                "name" : folder_name
+                "user": request.user.pk,
+                "name": folder_name,
             }
             instance_form = Bookmark_folder_form(data)
             if instance_form.is_valid():
@@ -76,9 +96,9 @@ def add(request):
                 raise_error(beautify_form_errors(instance_form.errors))
 
         data = {
-            "user" : request.user.pk,
-            "folder" : bookmark_folder,
-            "data" : postdata.get("data",{})
+            "user": request.user.pk,
+            "folder": bookmark_folder,
+            "data": postdata.get("data", {}),
         }
 
         instance_form = Bookmark_form(data)
@@ -92,9 +112,9 @@ def add(request):
         debug_exception(e)
         return HttpResponse(str(e), status=400)
 
-def remove(request):
-    """ Remove bookmark """
 
+def remove(request):
+    """Remove bookmark"""
 
     try:
         postdata = json.loads(request.body.decode("utf-8")) if request.body.decode("utf-8") else {}

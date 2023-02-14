@@ -8,7 +8,7 @@ function refresh() {
 
 function remove_bookmark_modal(key,index) {
     current_record = DJANGODATA.records[key]["lists"][index]
-    
+
     document.getElementById("remove_modal_label").innerHTML = "Remove "+current_record.display_title+"?"
     bookmark_modal = new bootstrap.Modal(document.getElementById('remove_bookmark_modal'))
     bookmark_modal.show()
@@ -24,8 +24,8 @@ function remove_bookmark() {
         document.getElementById("remove_bookmark").disabled = false
 
         if (!response.ok) {
-            return response.text().then(text => { 
-                throw new Error(text) 
+            return response.text().then(text => {
+                throw new Error(text)
             })
         }
         return response.text()
