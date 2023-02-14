@@ -2,3 +2,9 @@ Django
 requests
 jsonfield
 python-dotenv
+
+pre-commit
+isort
+black
+flake8
+pycodestyle
